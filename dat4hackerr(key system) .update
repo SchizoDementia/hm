@@ -1,4 +1,4 @@
--- crack from by https://scriptblox/u/zxcv 🥀🥀💔
+-- hi
 --[[ https://scriptblox.com/u/Dat4hackerzzzz --]]
 local function setup(whitelistbool)
     loadstring(game:HttpGet("https://techhub.group/scripts/DAT4HACKERR_HUB/ssd.lua"))()
