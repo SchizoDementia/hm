@@ -1,0 +1,194 @@
+--[[ https://scriptblox.com/u/ce_poulet --]]
+-- Script By ce_poulet Scriptblox / ChickenSquiggles Discord
+
+local localPlayer = game:GetService("Players").LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+
+local rs               = game:GetService("ReplicatedStorage")
+local miningEvents     = rs:WaitForChild("shared/network/MiningNetwork@GlobalMiningEvents")
+local miningFunctions  = rs:WaitForChild("shared/network/MiningNetwork@GlobalMiningFunctions")
+local m1               = game:GetService("ReplicatedStorage"):WaitForChild("Ml")
+local collectEvent     = miningEvents:WaitForChild("CollectItem")
+local mineEvent        = miningEvents:WaitForChild("Mine")
+local teleportEvent    = miningFunctions:WaitForChild("TeleportToMineArea")
+local sellAllEvent     = m1:WaitForChild("SellInventory")
+local equipEvent       = m1:WaitForChild("EquipItem")
+
+local lookFor = ""
+
+
+local chknUi = loadstring(game:HttpGet("https://rbxscripts.pythonanywhere.com/chknuibeta"))()
+local Base = chknUi.init()
+
+local function Sell(event)
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+    local oldPos = character.HumanoidRootPart.CFrame.Position
+    chknUi.Tools:Teleport(Vector3.new(1017.0339965820312, 244.99996948242188, -65.29679870605469))
+    task.wait(.5)
+    event:FireServer()
+    task.wait(.5)
+    chknUi.Tools:Teleport(oldPos) 
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+end
+
+local BasicTab = Base:Tab("Basic")
+BasicTab:Label("Sell",Enum.TextXAlignment.Center)
+BasicTab:Button({
+    text="Sell All",
+    TextXAlignment = Enum.TextXAlignment.Left,
+    callback=function()
+        Sell(sellAllEvent)
+    end
+})
+BasicTab:Splitter()
+BasicTab:Label("Mining", Enum.TextXAlignment.Center)
+BasicTab:Toggle({
+    text="Mining Aura",
+    callback=function(state)
+        if _G.MiningAura then _G.MiningAura:Disconnect() end
+
+        if not state then return end
+        _G.MiningAura = game:GetService("RunService").RenderStepped:Connect(function()
+            mineEvent:FireServer(workspace.CurrentCamera.CFrame.LookVector*100, 10)
+        end)
+    end,
+})
+BasicTab:Splitter()
+BasicTab:Label("TPs", Enum.TextXAlignment.Center)
+BasicTab:Button({
+    text="Overworld",
+    callback=function()
+        teleportEvent:FireServer(0, "Mine Passage Entrance")
+    end,
+})
+BasicTab:Button({
+    text="Mine Passage Entrance",
+    callback=function()
+        teleportEvent:FireServer(0, "Mine Passage")
+    end,
+})
+BasicTab:Splitter()
+
+local function collect(item)
+    if lookFor ~= "" then
+        if string.find(string.lower(item.Name), lookFor) then
+            collectEvent:FireServer(item.Name)
+        end
+    else
+        collectEvent:FireServer(item.Name)
+    end
+end
+
+local function collectAll()
+    for _,item in workspace.Items:GetChildren() do
+        collect(item)
+    end
+end
+
+local OreTab = Base:Tab("Ores")
+OreTab:Label("Ores", Enum.TextXAlignment.Center)
+OreTab:Input({
+    text="Search For",
+    callback=function(state)
+        lookFor = string.lower(state)
+    end,
+})
+OreTab:Toggle({
+    text="Collection Aura",
+    callback=function(state)
+        if _G.CollectionAura then _G.CollectionAura:Disconnect() end
+        if state then
+            collectAll()
+            _G.CollectionAura = workspace.Items.ChildAdded:Connect(function(child)
+                collect(child)
+            end)
+        end
+    end,
+})
+OreTab:Toggle({
+    text="Perma Radar",
+    callback=function(state)
+        if _G.Radar then _G.Radar:Disconnect() end
+        local function highlight(part)
+            if lookFor ~= "" and not string.find(string.lower(part.Name), lookFor) then return end
+        	local adorn = Instance.new("BoxHandleAdornment")
+        	adorn.Adornee = part
+	        adorn.AlwaysOnTop = true
+	        adorn.ZIndex = 10
+	        adorn.Size = part.Size
+	        adorn.Color3 = Color3.fromRGB(255, 0, 0)
+	        adorn.Transparency = 0.5
+	        adorn.Parent = game:GetService("CoreGui")
+
+        	local connection
+        	connection = part.AncestryChanged:Connect(function(_, parent)
+        		if not parent then
+        			adorn:Destroy()
+        			connection:Disconnect()
+        		end
+        	end)
+        end
+
+        if state then
+            for _,item in workspace.Items:GetChildren() do
+                highlight(item)            
+            end
+            _G.Radar = workspace.Items.ChildAdded:Connect(function(child)
+                highlight(child)
+            end)
+        else
+            for _,selection in game:GetService("CoreGui"):GetChildren() do
+                if selection.Name == "BoxHandleAdornment" then
+                    selection:Destroy()
+                end
+            end
+        end
+        
+    end,
+})
+OreTab:Splitter()
+
+
+local function Equip(toolName, toolType)
+    equipEvent:FireServer(toolName)
+    local toolHolder = rs.Assets.Models[toolType]
+    for _,tool in localPlayer.Backpack:GetChildren() do
+        if string.find(tool.Name, string.sub(toolType, 1, string.len(toolType)-1)) then
+            tool:Destroy()
+        end
+    end
+    local newTool = toolHolder:FindFirstChild(toolName):Clone()
+    for _,shit in newTool:GetChildren() do
+        if shit:IsA("BasePart") then
+            shit.Anchored = false
+        end
+    end
+    newTool.Parent = localPlayer.Backpack
+end
+local ToolTab = Base:Tab("Tools")
+ToolTab:Label("Equip Tools", Enum.TextXAlignment.Center)
+ToolTab:Button({
+    text="Best Pickaxe",
+    callback=function()
+        Equip("Dragon Pickaxe", "Pickaxes")
+    end,
+})
+ToolTab:Button({
+    text="Best Radar",
+    callback=function()
+        Equip("Celestite Radar", "Radars")
+    end,
+})
+ToolTab:Button({
+    text="Best Drill",
+    callback=function()
+        Equip("Ruby Drill", "Drills")
+    end,
+})
+ToolTab:Button({
+    text="Best Dynamite",
+    callback=function()
+        Equip("Toxic Dynamite", "Dynamite")
+    end,
+})
+ToolTab:Splitter()

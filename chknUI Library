@@ -1,0 +1,993 @@
+-- A chknUI library i guess..
+--[[ https://scriptblox.com/u/ce_poulet --]]
+local chknUI = {}
+
+local shrd = {}
+shrd.__index = shrd
+function shrd:Enable()
+	if not table.find(self.parent.children, self) then
+		if self.index then
+			table.insert(self.parent.children, self.index, self)
+		else
+			table.insert(self.parent.children, self)
+		end
+	end
+	self.uiElement.Visible = true
+	self.parent:Update()
+	return self
+end
+function shrd:Disable()
+	if table.find(self.parent.children, self) then
+		self.index = table.find(self.parent.children, self)
+		table.remove(self.parent.children, table.find(self.parent.children, self))
+		self.uiElement.Visible = false
+	end
+	self.parent:Update()
+	return self	
+end
+function shrd:Destroy()
+	if table.find(self.parent.children, self) then
+		table.remove(self.parent.children, table.find(self.parent.children, self))
+	end
+	if self.uiElement then
+		self.uiElement:Destroy()
+	end
+	self.parent:Update()
+	return nil
+end
+function shrd:Up()
+	local index = table.find(self.parent.children, self)
+	if index then
+		if index ~= 1 then
+			local temp = self.parent.children[index-1]
+			self.parent.children[index-1] = self
+			self.parent.children[index] = temp
+		end
+	end
+	self.parent:Update()
+	return self	
+end
+function shrd:Down()
+	local index = table.find(self.parent.children, self)
+	if index then
+		if index ~= #self.parent.children then
+			local temp = self.parent.children[index+1]
+			self.parent.children[index+1] = self
+			self.parent.children[index] = temp
+		end
+	end
+	self.parent:Update()
+	return self
+end
+function shrd:Keybind(keybind)
+	if keybind then
+		shrd.bckndkb(keybind,self)
+	end
+	return self
+end
+
+chknUI.Theme = {
+	AccentColor3 = Color3.fromRGB(100,100,255)
+}
+
+local CollectionService = game:GetService("CollectionService")
+
+function chknUI.init(...)
+	local params = ... or {}
+	if _G.CHKNUIUIS then
+		_G.CHKNUIUIS:Disconnect()
+	end
+	if _G.CHKNUIUPDATE then
+		_G.CHKNUIUPDATE:Disconnect()
+	end
+
+	local sgui = Instance.new("ScreenGui")
+	sgui.Name =  "ChknUI"
+	if game:GetService("RunService"):IsStudio() then
+		if game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("ChknUI") then
+			game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("ChknUI"):Destroy()
+		end
+		sgui.Parent = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+	else
+		if game:GetService("CoreGui"):FindFirstChild("ChknUI") then
+			game:GetService("CoreGui"):FindFirstChild("ChknUI"):Destroy()
+		end
+		sgui.Parent = game:GetService("CoreGui")
+	end
+
+
+
+	local base = {
+		uiElement=sgui,
+		tabs=0,
+		rainbow = 0,
+		theme=chknUI.Theme,
+		enabled=true,
+		rainbowSpeed = 2,
+		keybinds={}
+	}
+	function base.BCKNDKB(k,i)
+		if not base.keybinds[k] then
+			base.keybinds[k] = {}
+		end
+		for keybind,t in base.keybinds do
+			if table.find(t, i) then
+				table.remove(base.keybinds[keybind], table.find(base.keybinds[keybind], i))
+			end
+		end
+		table.insert(base.keybinds[k], i)
+		
+		if i.Type == "toggle" then
+			i.uiElement.Frame.Frame.TextLabel.Text = k.Name
+		elseif i.Type == "button" then
+			i.uiElement.Frame.Frame.TextLabel.Text = k.Name
+		end
+	end
+	shrd.bckndkb = base.BCKNDKB
+
+	function base:Tab(...) 
+		local params = {...} or {}
+		base.tabs += 1
+
+		local frame = Instance.new("Frame", base.uiElement)
+		local area = Instance.new("Frame", frame)
+		local seperator = Instance.new("Frame", frame)
+		local minimize = Instance.new("TextButton",frame)
+
+		-- Properties and arbitrary initialization
+		do
+			frame.Size = UDim2.new(0,200,0,20)
+			frame.Position = UDim2.new(0,225*base.tabs,0,10)
+			frame.BorderSizePixel = 0
+			frame.BackgroundColor3 = Color3.new(1,1,1)
+			frame.Name = params[1] or "Unnamed"
+			frame.BackgroundTransparency = .2
+
+			local gradient = Instance.new("UIGradient",frame)
+			gradient.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
+				ColorSequenceKeypoint.new(.5, Color3.fromRGB(25, 25, 25)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
+			}
+
+			local drag = Instance.new("UIDragDetector")
+			drag.Parent = frame
+
+			local label = Instance.new("TextLabel", frame)
+			label.Text = params[1] or "Unnamed"
+			label.Size = UDim2.new(1,0,.6,0)
+			label.TextXAlignment = Enum.TextXAlignment.Left
+			label.Position = UDim2.new(0,10,.5,0)
+			label.AnchorPoint = Vector2.new(0,.5)
+			label.BackgroundTransparency = 1
+			label.TextColor3 = Color3.new(1,1,1)
+			label.Font = Enum.Font.Ubuntu
+			label.TextScaled = true
+			label.Name = "Title"
+
+			minimize.Position = UDim2.new(1,0,0,0)
+			minimize.Size = UDim2.new(0,20,0,20)
+			minimize.AnchorPoint = Vector2.new(1,0)
+			minimize.BackgroundTransparency = 1
+			minimize.Text = "–"
+			minimize.TextColor3 = Color3.fromRGB(190,190,190)
+			minimize.Name = "Minimize"
+
+			seperator.Position = UDim2.new(0,0,1,0)
+			seperator.Size = UDim2.new(1,0,0,2)
+			seperator.AnchorPoint = Vector2.new(0,0)
+			seperator.BackgroundColor3 = base.theme.AccentColor3
+			seperator.BorderSizePixel = 0
+			seperator.Name = "Seperator"
+			CollectionService:AddTag(seperator, "RequiresAttentionAccent")
+
+			area.Position = UDim2.new(0,0,1,2)
+			area.Size = UDim2.new(1,0,0,20)
+			area.BorderSizePixel = 0
+			area.BackgroundColor3 = Color3.new(1,1,1)
+			area.Name = "Area"
+			area.BackgroundTransparency = .2
+
+			local areagradient = Instance.new("UIGradient", area)
+			areagradient.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
+				ColorSequenceKeypoint.new(.5, Color3.fromRGB(25, 25, 25)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
+			}
+			area.ClipsDescendants = true
+		end
+
+		-- Tab table and its function
+		local tab = {
+			uiElement=frame,
+			minimized = false,
+			expectedSize = 20,
+			children={}
+		}
+		function tab:Destroy()
+			if tab.uiElement then
+				tab.uiElement:Destroy()
+				base.tabs -= 1
+			end
+		end
+		function tab:Update()
+			tab.expectedSize = 10
+			for index,element in tab.children do
+				if element.uiElement then
+					if element.Type == "splitter" then
+						element.uiElement.Position = UDim2.new(.5,0,0,tab.expectedSize+(element.uiElement.AbsoluteSize.Y/2))
+					else
+						element.uiElement.Position = UDim2.new(.5,0,0,tab.expectedSize)
+					end
+					tab.expectedSize += element.uiElement.AbsoluteSize.Y + 10
+				end
+			end
+			if not tab.minimized then
+				area.Size = UDim2.new(1, 0, 0, tab.expectedSize)
+			end
+		end
+		function tab:Rainbow()
+			CollectionService:AddTag(seperator, "RequiresAttentionRainbow")
+			return tab
+		end
+		function tab:Clear()
+			for _,element in tab.children do
+				element.uiElement:Destroy()
+			end
+			tab.children = {}
+			tab:Update()
+		end
+
+		-- Elements
+		function tab:Label(...)
+			local params = {...} or {}
+
+			local LABEL = {
+				uiElement=nil,
+				size=20,
+				Type="label",
+				parent=tab
+			}
+			setmetatable(LABEL, shrd)
+
+			local labelFrame = Instance.new("Frame", area)
+			labelFrame.AnchorPoint = Vector2.new(.5,0)
+			labelFrame.Position = UDim2.new(0,0,0,0)
+			labelFrame.Size = UDim2.new(0,area.AbsoluteSize.X-20,0,LABEL.size)
+			labelFrame.BorderSizePixel = 1
+			labelFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			labelFrame.BackgroundTransparency = 1
+			labelFrame.BorderColor3 = Color3.fromRGB(100,100,100)
+
+			local label = Instance.new("TextLabel", labelFrame)
+			label.Text = params[1] or "Label"
+			label.Size = UDim2.new(1,0,.7,0)
+			label.TextXAlignment = params[2] or Enum.TextXAlignment.Left
+			if label.TextXAlignment == Enum.TextXAlignment.Left then	
+				label.Position = UDim2.new(0,5,.5,0)
+			elseif label.TextXAlignment == Enum.TextXAlignment.Center then
+				label.Position = UDim2.new(0,0,.5,0)
+			else
+				label.Position = UDim2.new(0,-5,.5,0)
+			end
+			label.AnchorPoint = Vector2.new(0,.5)
+			label.BackgroundTransparency = 1
+			label.TextColor3 = Color3.new(1,1,1)
+			label.Font = Enum.Font.Ubuntu
+			label.TextScaled = true
+			label.Name = "Text"
+			
+			function LABEL:Change(txt)
+				label.Text = txt
+			end
+			LABEL.uiElement = labelFrame
+			table.insert(tab.children, LABEL)
+			tab:Update()
+			return LABEL
+		end
+
+		function tab:Button(...)
+			local params = ... or {}
+
+			local button = {
+				uiElement=nil,
+				notify = params["notify"] or true,
+				callback = params["callback"] or nil,
+				size=30,
+				Type="button",
+				parent=tab
+			}
+			setmetatable(button, shrd)
+
+			local textButton = Instance.new("TextButton", area)
+			textButton.AnchorPoint = Vector2.new(.5,0)
+			textButton.Position = UDim2.new(0,0,0,0)
+			textButton.Size = UDim2.new(0,area.AbsoluteSize.X-20,0,button.size)
+			textButton.BorderSizePixel = 1
+			textButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			textButton.BackgroundTransparency = .5
+			textButton.BorderColor3 = Color3.fromRGB(100,100,100)
+			textButton.Text = ""
+
+			local box = Instance.new("Frame", textButton)
+			box.AnchorPoint = Vector2.new(.5,.5)
+			box.Position = UDim2.new(1,-20,0,15)
+			box.Size = UDim2.new(0,18,0,18)
+			box.BackgroundTransparency = 1
+			box.BorderSizePixel = 0
+			local box2 = Instance.new("Frame", box)
+			box2.AnchorPoint = Vector2.new(.5,.5)
+			box2.Position = UDim2.new(.5,0,.5,0)
+			box2.Size = UDim2.new(1,-2,1,-2)
+			box2.BackgroundTransparency = 1
+			box2.BorderSizePixel = 0
+			box2.Active = false
+			local keybind = Instance.new("TextLabel", box2)
+			keybind.Size = UDim2.new(1,0,1,0)
+			keybind.BackgroundTransparency = 1
+			keybind.BorderSizePixel = 0
+			keybind.TextColor3 = Color3.fromRGB(255,255,255)
+			keybind.TextScaled = true
+			keybind.Text = "" 
+
+
+			textButton.MouseButton1Down:Connect(function()
+				if button.callback then
+					button.callback()
+				end
+				if button.notify then
+					base:Notify({text= params["text"].." Activated" or "Label",status="Enabled"})
+				end
+			end)
+			textButton.TouchTap:Connect(function()
+				if button.callback then
+					button.callback()
+				end
+				if button.notify then
+					base:Notify({text= params["text"].." Activated" or "Label",status="Enabled"})
+				end
+			end)
+
+
+			local label = Instance.new("TextLabel", textButton)
+			label.Text = params["text"] or "Label"
+			label.Size = UDim2.new(1,0,.4,0)
+			label.TextXAlignment = params["TextXAlignment"] or Enum.TextXAlignment.Left
+			if label.TextXAlignment == Enum.TextXAlignment.Left then	
+				label.Position = UDim2.new(0,10,.5,-1)
+			elseif label.TextXAlignment == Enum.TextXAlignment.Center then
+				label.Position = UDim2.new(0,0,.5,0)
+			else
+				label.Position = UDim2.new(0,-10,.5,1)
+			end
+			label.AnchorPoint = Vector2.new(0,.5)
+			label.BackgroundTransparency = 1
+			label.TextColor3 = Color3.new(1,1,1)
+			label.Font = Enum.Font.Ubuntu
+			label.TextScaled = true
+			label.Active = false
+
+			local buttonLabel = Instance.new("TextLabel", textButton)
+			buttonLabel.Text = "Button"
+			buttonLabel.Size = UDim2.new(1,0,.3,0)
+			buttonLabel.TextXAlignment = Enum.TextXAlignment.Right
+			buttonLabel.AnchorPoint = Vector2.new(1,0)
+			buttonLabel.BackgroundTransparency = 1
+			buttonLabel.Position = UDim2.new(1, -5, 0, 2)
+			buttonLabel.TextColor3 = Color3.new(1,1,1)
+			buttonLabel.TextTransparency = .4
+			buttonLabel.Font = Enum.Font.Ubuntu
+			buttonLabel.TextScaled = true
+			buttonLabel.Active = false
+			
+			button.uiElement = textButton
+
+			function button:Rainbow()
+				CollectionService:AddTag(textButton,"RequiresAttentionAccent")
+				CollectionService:AddTag(textButton,"RequiresAttentionRainbow")
+				CollectionService:AddTag(textButton,"AttentionBorder")
+				return button
+			end
+			table.insert(tab.children, button)
+			tab:Update()
+			return button
+		end
+
+		function tab:Toggle(...)
+			local params = ... or {}
+
+			local toggle = {
+				uiElement=nil,
+				state = false,
+				notify = params["notify"] or true,
+				callback = params["callback"] or nil,
+				size=30,
+				Type="toggle",
+				parent=tab
+			}
+			setmetatable(toggle, shrd)
+			
+
+			local textFrame = Instance.new("Frame", area)
+			textFrame.AnchorPoint = Vector2.new(.5,0)
+			textFrame.Position = UDim2.new(0,0,0,0)
+			textFrame.Size = UDim2.new(0,area.AbsoluteSize.X-20,0,toggle.size)
+			textFrame.BorderSizePixel = 1
+			textFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			textFrame.BackgroundTransparency = .5
+			textFrame.BorderColor3 = Color3.fromRGB(100,100,100)
+
+			local label = Instance.new("TextLabel", textFrame)
+			label.Text = params["text"] or "Label"
+			label.Size = UDim2.new(1,0,.4,0)
+			label.TextXAlignment = params["TextXAlignment"] or Enum.TextXAlignment.Left
+			if label.TextXAlignment == Enum.TextXAlignment.Left then	
+				label.Position = UDim2.new(0,10,.5,0)
+			elseif label.TextXAlignment == Enum.TextXAlignment.Center then
+				label.Position = UDim2.new(0,0,.5,0)
+			else
+				label.Position = UDim2.new(0,-10,.5,0)
+			end
+			label.AnchorPoint = Vector2.new(0,.5)
+			label.BackgroundTransparency = 1
+			label.TextColor3 = Color3.new(1,1,1)
+			label.Font = Enum.Font.Ubuntu
+			label.TextScaled = true
+			label.Name = "Text"
+			label.Active = false
+
+
+			local box = Instance.new("Frame", textFrame)
+			box.AnchorPoint = Vector2.new(.5,.5)
+			box.Position = UDim2.new(1,-20,0,15)
+			box.Size = UDim2.new(0,18,0,18)
+			box.BackgroundColor3 = Color3.fromRGB(98, 98, 98)
+			box.BorderSizePixel = 0
+
+			local box2 = Instance.new("Frame", box)
+			box2.AnchorPoint = Vector2.new(.5,.5)
+			box2.Position = UDim2.new(.5,0,.5,0)
+			box2.Size = UDim2.new(1,-2,1,-2)
+			box2.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			box2.BorderSizePixel = 0
+			box2.Active = false
+			
+			
+			local box3 = Instance.new("Frame", box2)
+			box3.Size = UDim2.new(1,0,1,0)
+			box3.BackgroundTransparency = 0
+			box3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			box3.AnchorPoint = Vector2.new(.5,.5)
+			box3.BorderSizePixel = 0
+			box3.Active = false
+			box3.Position = UDim2.fromScale(.5, .5)
+			
+			local grad = Instance.new("UIGradient", box3)
+			grad.Transparency = NumberSequence.new{
+				NumberSequenceKeypoint.new(0,1),
+				NumberSequenceKeypoint.new(1,1)
+			}
+			grad.Rotation = -45
+			
+			local keybind = Instance.new("TextLabel", box2)
+			keybind.Size = UDim2.new(1,0,1,0)
+			keybind.BackgroundTransparency = 1
+			keybind.BorderSizePixel = 0
+			keybind.TextColor3 = Color3.new(1,1,1)
+			keybind.TextScaled = true
+			keybind.Text = "" 
+			keybind.ZIndex = 5
+
+			local trans = 2
+			local busy = false
+			function toggle:Toggle()
+				if busy then return end
+				busy = true
+				toggle.state = not toggle.state
+				if toggle.callback then
+					toggle.callback(toggle.state)
+				end
+				if toggle.notify then
+					base:Notify({text=(params["text"].." "..(toggle.state and "Enabled"  or "Disabled")) or "Label",status= toggle.state and "Enabled"  or "Disabled"})
+				end
+				if toggle.state then
+					while trans > 0.1 do
+						trans = math.lerp(trans,0,.1)
+						local clmp = math.clamp(trans, 0, 1)
+						local clmpm = math.clamp(trans-1, 0, 1)
+						local cc = math.lerp(keybind.TextColor3.R, 0, .1)
+						keybind.TextColor3 = Color3.new(cc,cc,cc)
+						print(cc)
+						grad.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,clmpm),NumberSequenceKeypoint.new(1,clmp)}
+						task.wait()
+					end
+					trans = 0
+					grad.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,0)}
+				else
+					while trans < 1.9 do
+						trans = math.lerp(trans,2,.1)
+						local clmp = math.clamp(trans, 0, 1)
+						local clmpm = math.clamp(trans-1, 0, 1)
+						local cc = math.lerp(keybind.TextColor3.R, 1, .1)
+						keybind.TextColor3 = Color3.new(cc,cc,cc)
+						grad.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,clmpm),NumberSequenceKeypoint.new(1,clmp)}
+						task.wait()
+					end
+					trans = 2
+					grad.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(1,1)}
+				end
+				busy = false
+			end
+
+			
+			box.InputBegan:Connect(function(inp)
+				if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+					toggle:Toggle()
+				end
+			end)
+
+
+			
+
+			function toggle:Rainbow()
+				CollectionService:AddTag(textFrame,"RequiresAttentionAccent")
+				CollectionService:AddTag(textFrame,"RequiresAttentionRainbow")
+				CollectionService:AddTag(textFrame,"AttentionBorder")
+
+				CollectionService:AddTag(box3,"RequiresAttentionAccent")
+				CollectionService:AddTag(box3,"RequiresAttentionRainbow")
+				return toggle
+			end
+			
+			toggle.uiElement = textFrame
+			table.insert(tab.children, toggle)
+			tab:Update()
+			return toggle
+		end
+
+		function tab:Slider(...)
+			local params = ... or {}
+
+			local slider = {
+				uiElement=nil,
+				state = ((params["min"]+params["max"])/2) or 0,
+				min = params["min"] or 0,
+				max = params["max"] or 100,
+				callback = params["callback"] or nil,
+				size=30,
+				Type="slider",
+				parent=tab
+			}
+			setmetatable(slider, shrd)
+
+			local textLabel = Instance.new("TextLabel", area)
+			textLabel.AnchorPoint = Vector2.new(.5,0)
+			textLabel.Position = UDim2.new(0,0,0,0)
+			textLabel.Size = UDim2.new(0,area.AbsoluteSize.X-20,0,slider.size)
+			textLabel.BorderSizePixel = 1
+			textLabel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			textLabel.BackgroundTransparency = .5
+			textLabel.BorderColor3 = Color3.fromRGB(100,100,100)
+			textLabel.Text = "  "..params["text"] or "Test"
+			textLabel.TextXAlignment = Enum.TextXAlignment.Left
+			textLabel.TextYAlignment = Enum.TextYAlignment.Top
+			textLabel.TextColor3 = Color3.new(1,1,1)
+			textLabel.Font = Enum.Font.Ubuntu
+			textLabel.TextSize+=5
+
+			local rightText = Instance.new("TextLabel",textLabel)
+			rightText.Parent = textLabel
+			rightText.Size = UDim2.new(1,0,1,0)
+			rightText.TextColor3 = Color3.new(1,1,1)
+			rightText.Font = Enum.Font.Ubuntu
+			rightText.TextSize+=5
+			rightText.BackgroundTransparency = 1
+			rightText.TextXAlignment = Enum.TextXAlignment.Right
+			rightText.TextYAlignment = Enum.TextYAlignment.Top
+			rightText.Text = slider.state.." "
+
+
+			local bar = Instance.new("Frame",textLabel)
+			bar.AnchorPoint = Vector2.new(.5,.5)
+			bar.Size = UDim2.new(1,-20,0,2)
+			bar.Position = UDim2.new(.5,0,1,-8)
+			bar.BackgroundColor3 = Color3.fromRGB(98, 98, 98)
+
+			local circle = Instance.new("Frame", bar)
+			circle.Position = UDim2.new(0,math.round(math.map(slider.state,slider.min,slider.max,0,bar.AbsoluteSize.X)),0,0)
+			circle.Size = UDim2.new(0,9,0,9)
+			circle.AnchorPoint = Vector2.new(.5,.5)
+			circle.BackgroundColor3 = Color3.new(1,1,1)
+			local rounded = Instance.new("UICorner",circle)
+			rounded.CornerRadius = UDim.new(1,0)
+
+			textLabel.MouseMoved:Connect(function(x,y)
+				if game:GetService("UserInputService"):IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+					local newx = x-textLabel.AbsolutePosition.X
+					if newx < 10 then return end
+					if newx > 10+bar.AbsoluteSize.X then return end
+					slider.state = math.round(math.map(newx-10,0,bar.AbsoluteSize.X,slider.min,slider.max))
+					rightText.Text = slider.state.." "
+					circle.Position = UDim2.new(0,newx-10,0,0)
+					if slider.callback then
+						slider.callback(slider.state)
+					end
+				end
+			end)
+			textLabel.TouchPan:Connect(function(x,y)
+				if game:GetService("UserInputService"):IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+					local newx = x-textLabel.AbsolutePosition.X
+					if newx < 10 then return end
+					if newx > 10+bar.AbsoluteSize.X then return end
+					slider.state = math.round(math.map(newx-10,0,bar.AbsoluteSize.X,slider.min,slider.max))
+					rightText.Text = slider.state.." "
+					circle.Position = UDim2.new(0,newx-10,0,0)
+					if slider.callback then
+						slider.callback(slider.state)
+					end
+				end
+			end)
+
+			function slider:Rainbow()
+				CollectionService:AddTag(textLabel,"RequiresAttentionAccent")
+				CollectionService:AddTag(textLabel,"RequiresAttentionRainbow")
+				CollectionService:AddTag(textLabel,"AttentionBorder")
+
+				CollectionService:AddTag(circle,"RequiresAttentionAccent")
+				CollectionService:AddTag(circle,"RequiresAttentionRainbow")
+				return slider
+			end
+			slider.uiElement = textLabel
+			table.insert(tab.children, slider)
+			tab:Update()
+			return slider
+		end
+
+		function tab:Splitter(...)
+			local params = {...} or {}
+			local splitter = {
+				uiElement = nil,
+				size = params[1] or 1,
+				Type="splitter",
+				parent=tab
+			}
+			setmetatable(splitter, shrd)
+
+			local line = Instance.new("Frame", area)
+			line.Position = UDim2.new(0,0,0,0)
+			line.AnchorPoint = Vector2.new(.5,.5)
+			line.BackgroundColor3 = params[2] or base.theme.AccentColor3
+			line.Size = UDim2.new(1,-20,0,splitter.size)
+
+			local rond = Instance.new("UICorner", line)
+			rond.CornerRadius = UDim.new(0,4)
+
+
+			function splitter:Rainbow()
+				CollectionService:AddTag(line, "RequiresAttentionAccent")
+				CollectionService:AddTag(line, "RequiresAttentionRainbow")
+			end
+			splitter.uiElement = line
+			table.insert(tab.children, splitter)
+			tab:Update()
+			return splitter
+		end
+
+		function tab:Input(...)
+			local params = ... or {}
+
+			local input = {
+				uiElement=nil,
+				notify = params["notify"] or true,
+				callback = params["callback"] or nil,
+				size=30,
+				Type="button",
+				parent=tab
+			}
+			setmetatable(input, shrd)
+
+			local textBox = Instance.new("TextBox", area)
+			textBox.AnchorPoint = Vector2.new(.5,0)
+			textBox.Position = UDim2.new(0,0,0,0)
+			textBox.Size = UDim2.new(0,area.AbsoluteSize.X-20,0,input.size)
+			textBox.BorderSizePixel = 1
+			textBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			textBox.BackgroundTransparency = .5
+			textBox.BorderColor3 = Color3.fromRGB(100,100,100)
+			textBox.Text = ""
+			textBox.ClearTextOnFocus = false
+			textBox.TextColor3 = Color3.new(1,1,1)
+			textBox.TextXAlignment = params["TextXAlignment"] or Enum.TextXAlignment.Center
+
+			textBox:GetPropertyChangedSignal("Text"):Connect(function()
+				local txt = textBox.Text
+				if params["callback"] then
+					params["callback"](txt) 
+				end
+			end)
+
+			local label = Instance.new("TextLabel", textBox)
+			label.Text = params["text"] and "  "..params["text"] or "  Input"
+			label.Size = UDim2.fromScale(1,1)
+			label.TextXAlignment = Enum.TextXAlignment.Left
+			label.TextYAlignment = Enum.TextYAlignment.Top
+			label.BackgroundTransparency = 1
+			label.TextColor3 = Color3.new(1,1,1)
+			label.Font = Enum.Font.Ubuntu
+			label.TextSize += 5
+			label.Active = false
+			
+			local inputLabel = Instance.new("TextLabel", textBox)
+			inputLabel.Text = "Input"
+			inputLabel.Size = UDim2.new(1,0,.3,0)
+			inputLabel.TextXAlignment = Enum.TextXAlignment.Right
+			inputLabel.AnchorPoint = Vector2.new(1,0)
+			inputLabel.BackgroundTransparency = 1
+			inputLabel.Position = UDim2.new(1, -5, 0, 2)
+			inputLabel.TextColor3 = Color3.new(1,1,1)
+			inputLabel.TextTransparency = .4
+			inputLabel.Font = Enum.Font.Ubuntu
+			inputLabel.TextScaled = true
+			inputLabel.Active = false
+
+			input.uiElement = textBox
+
+			function input:Rainbow()
+				CollectionService:AddTag(textBox,"RequiresAttentionAccent")
+				CollectionService:AddTag(textBox,"RequiresAttentionRainbow")
+				CollectionService:AddTag(textBox,"AttentionBorder")
+				return input
+			end
+			table.insert(tab.children, input)
+			tab:Update()
+			return input
+		end
+
+
+
+
+
+
+		minimize.InputBegan:Connect(function(inp)
+			if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+				if tab.minimized then
+					game:GetService("TweenService"):Create(area, TweenInfo.new(0.7, Enum.EasingStyle.Bounce), {Size = UDim2.new(1, 0, 0, tab.expectedSize)}):Play()
+				else
+					game:GetService("TweenService"):Create(area, TweenInfo.new(0.7, Enum.EasingStyle.Bounce), {Size = UDim2.new(1, 0, 0, 0)}):Play()
+				end
+				tab.minimized = not tab.minimized
+			end
+		end)
+		return tab
+	end
+
+
+	local step = 0
+	local cached = {}
+	_G.CHKNUIUPDATE = game:GetService("RunService").RenderStepped:Connect(function()
+		if base.enabled then
+			if cached then
+				for _, obj in cached do
+					if not CollectionService:HasTag(obj, "RequiresAttentionRainbow") then
+						if CollectionService:HasTag(obj, "AttentionBorder") then
+							obj.BorderColor3 = base.theme.AccentColor3
+						else		
+							obj.BackgroundColor3 = base.theme.AccentColor3
+						end
+					else
+						if CollectionService:HasTag(obj, "AttentionBorder") then
+							obj.BorderColor3 = Color3.fromHSV(base.rainbow,1,1)
+						else
+							obj.BackgroundColor3 = Color3.fromHSV(base.rainbow,1,1)
+						end
+					end
+				end
+			end
+			base.rainbow = (base.rainbow+base.rainbowSpeed/1000)%1
+		end
+	end)
+	task.spawn(function()
+		while _G.CHKNUIUPDATE do
+			task.wait(1)
+			cached = CollectionService:GetTagged("RequiresAttentionAccent")
+		end
+	end)
+
+
+	local originalPositions = {}
+	local busy = false
+	_G.CHKNUIUIS = game:GetService("UserInputService").InputBegan:Connect(function(inp,gp)
+		if not gp then
+			if inp.UserInputType == Enum.UserInputType.Keyboard then
+				if inp.KeyCode == Enum.KeyCode.RightControl then
+					if busy then return end
+					busy = true
+					local sorted = {}
+					local old = base.uiElement:GetChildren()
+					for i,a in old do if old.Name == "NOTIF" then table.remove(old,i) end end
+
+					while #old > 0 do
+						local least = 5000
+						local leastInstance = nil
+						for i,b in old do
+							if b.AbsolutePosition.X < least then
+								least = b.AbsolutePosition.X
+								leastInstance = b
+							end
+						end
+						table.insert(sorted, leastInstance)
+						table.remove(old, table.find(old,leastInstance))
+					end
+
+					for _,ui in sorted do
+						if ui.Name ~= "NOTIF" then
+							if base.enabled then
+								originalPositions[ui] = ui.Position
+								game:GetService("TweenService"):Create(ui, TweenInfo.new(0.4), {Position = UDim2.new(0,ui.AbsolutePosition.X,0,-1000)}):Play()
+								task.wait(.1)
+							else
+								game:GetService("TweenService"):Create(ui, TweenInfo.new(0.4,Enum.EasingStyle.Back), {Position = originalPositions[ui]}):Play()
+								task.wait(.2)
+							end
+						end
+					end
+					base.enabled = not base.enabled
+					busy = false
+				end
+				if base.keybinds[inp.KeyCode] then
+					for _,element in base.keybinds[inp.KeyCode] do
+						if element.Type == "toggle" then
+							element:Toggle()
+						elseif element.Type == "button" then
+							if element.callback then
+								element.callback()
+							end
+							if element.notify then
+								base:Notify({text= element.uiElement.TextLabel.Text.." Activated" or "Label",status="Enabled"})
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+	function base:Destroy()
+		if _G.CHKNUIUIS then
+			_G.CHKNUIUIS:Disconnect()
+		end
+		if _G.CHKNUIUPDATE then
+			_G.CHKNUIUPDATE:Disconnect()
+		end
+
+		if base.uiElement then
+			base.uiElement:Destroy()
+		end
+	end
+
+	local notifs = {}
+	function base:Notify(...)
+		local params = ... or {}
+
+		local cl = Color3.new(0,1,0)
+		if params["status"] then
+			local st = params["status"]
+
+			if st == "Success" or st == "Enabled" then
+				cl = Color3.new(0,1,0)
+			elseif st == "Warning" or st == "Disabled" then
+				cl = Color3.new(1,1,0)
+			elseif st == "Error" then
+				cl = Color3.new(1,0,0)
+			end
+		end
+
+		local frame = Instance.new("Frame", base.uiElement)
+		frame.Position = UDim2.new(1,-10,1,-10-(70*#notifs or 0))
+		frame.AnchorPoint = Vector2.new(1,1)
+		frame.Size = UDim2.new(0,0,0,60)
+		frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		frame.BackgroundTransparency = .2
+		frame.ClipsDescendants = true
+		frame.Name = "NOTIF"
+
+		table.insert(notifs,frame)
+
+		local roundy = Instance.new("UICorner",frame)
+		roundy.CornerRadius = UDim.new(0,10)
+
+		local borda = Instance.new("UIStroke",frame)
+		borda.Color = Color3.new(1,1,1)
+		borda.Thickness = 1
+
+		local grad = Instance.new("UIGradient", borda)
+		grad.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0,cl or Color3.fromRGB(0,255,0)),
+			--ColorSequenceKeypoint.new(.12,Color3.fromRGB(120,120,120)),
+			--ColorSequenceKeypoint.new(.80,Color3.fromRGB(120,120,120)),
+			ColorSequenceKeypoint.new(1,base.theme.AccentColor3)
+		}
+
+		local title = Instance.new("TextLabel",frame)
+		title.Size = UDim2.new(1,-10,1,-10)
+		title.Position = UDim2.new(0,10,0,7)
+		title.TextXAlignment = Enum.TextXAlignment.Left
+		title.TextYAlignment = Enum.TextYAlignment.Top
+		title.Text = params["status"] or "Success"
+		title.Font = Enum.Font.Ubuntu
+		title.TextSize = 9
+		title.BackgroundTransparency = 1
+		title.TextColor3 = cl or Color3.fromRGB(0,255,0)
+		title.TextTransparency = 1
+
+		local text = Instance.new("TextLabel",frame)
+		text.Position = UDim2.new(1,0,0,0)
+		text.AnchorPoint = Vector2.new(1,0)
+		text.Size = UDim2.new(0,270,0,60)
+		text.Text = params["text"] or "None"
+		text.Font = Enum.Font.Ubuntu
+		text.TextSize = 12
+		text.BackgroundTransparency = 1
+		text.TextColor3 = Color3.new(1,1,1)
+		text.TextWrapped = true
+
+		task.spawn(function()
+			game:GetService("TweenService"):Create(title, TweenInfo.new(.7, Enum.EasingStyle.Bounce), {TextTransparency = 0}):Play()
+			game:GetService("TweenService"):Create(frame, TweenInfo.new(.7, Enum.EasingStyle.Bounce), {Size = UDim2.new(0,270,0,60)}):Play()
+			task.wait(params["duration"] or 5)
+			game:GetService("TweenService"):Create(title, TweenInfo.new(.7, Enum.EasingStyle.Bounce), {TextTransparency = 1}):Play()
+			game:GetService("TweenService"):Create(frame, TweenInfo.new(.7, Enum.EasingStyle.Bounce), {Size = UDim2.new(0,0,0,60)}):Play()
+			wait(.7)
+			table.remove(notifs,table.find(notifs,frame))
+			for i,a in notifs do
+				game:GetService("TweenService"):Create(a, TweenInfo.new(.1), {Position = UDim2.new(1,-10,1,-10-(70*(i-1)))}):Play()
+			end
+			frame:Destroy()
+		end)
+	end
+
+	task.spawn(function()
+		base:Notify({text="ChknUI Successfully Loaded",duration=3,status="Success"})
+	end)
+
+	shrd.base = base
+	return base
+end
+
+
+chknUI.Tools = {}
+function chknUI.Tools:PromptDiscord(InviteCode)
+	local rq = request or http_request or http and http.request
+	local HttpService=game:GetService("HttpService")
+	rq({
+	    Url = "http:".."//127.0.0.1:6463/rpc?v=1",
+	    Method = "POST",
+	    Headers = {
+	        ["Content-Type"] = "application/json",
+	        ["Origin"] = "https:".."//discord.com"
+	    },
+	    Body = HttpService:JSONEncode({
+	        cmd = "INVITE_BROWSER",
+	        args = {code = InviteCode},
+	        nonce = HttpService:GenerateGUID(false)
+	    })
+	})
+end
+function chknUI.Tools:CopyPlayerPosition()
+	local player = game:GetService("Players").LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	local pos = hrp.CFrame.Position
+	local output = ""
+	output ..= "Vector3.new("
+	output ..= 	tostring(pos)
+	output ..= ")"
+	print(output)
+	toclipboard(output)
+end
+function chknUI.Tools:Teleport(vec3)
+	local player = game:GetService("Players").LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	character:PivotTo(CFrame.new(vec3))
+end
+
+return chknUI

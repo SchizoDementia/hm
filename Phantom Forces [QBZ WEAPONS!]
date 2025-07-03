@@ -1,0 +1,714 @@
+-- Ask ChatGPT, to make every variables readable.
+--[[ https://scriptblox.com/u/ce_poulet --]]
+local v8 = false;
+local v9 = 100;
+local v10 = false;
+local v11 = false;
+local v12 = false;
+local v13 = false;
+local v14 = tostring(game:GetService('Players').LocalPlayer.UserId);
+local v15 = loadstring(game:HttpGet('https://movefast.pythonanywhere.com/robloxscripts?script=phantom&userid=' .. v14))();
+if v15 then
+    local v52 = 0;
+    local v53;
+    while true do
+        if (v52 == (0)) then
+            v53 = table.find(v15, v14);
+            if v53 then
+                table.remove(v53);
+            end
+            break
+        end
+    end
+end
+local v16 = loadstring(game:HttpGet('https://movefast.pythonanywhere.com/robloxscripts/chknui'))();
+local v17 = v16.init();
+v17.rainbowSpeed = 3;
+do
+    local v27 = 0;
+    local v28;
+    while true do
+        if (v27 == (1)) then
+            v28:Toggle({
+                text = 'Aimbot',
+                callback = function(v97, v98)
+                    v8 = v97;
+                end
+            });
+            v28:Slider({
+                text = 'FOV',
+                callback = function(v99, v100)
+                    v9 = v99;
+                end,
+                min = 30,
+                max = 200
+            });
+            v27 = 2;
+        end
+        if (v27 == (0)) then
+            v28 = v17:Tab({
+                name = 'Rage'
+            });
+            v28:Label({
+                text = 'AIMBOT',
+                TextXAlignment = Enum.TextXAlignment.Center
+            });
+            v27 = 1;
+        end
+        if (v27 == (2)) then
+            v28:Label({
+                text = 'Other',
+                TextXAlignment = Enum.TextXAlignment.Center
+            });
+            v28:Toggle({
+                text = 'Auto Melee',
+                callback = function(v101, v102)
+                    v12 = v101;
+                end
+            });
+            break
+        end
+    end
+end
+do
+    local v29 = 0;
+    local v30;
+    while true do
+        if (v29 == (1)) then
+            v30:Toggle({
+                text = 'Chams',
+                callback = function(v103, v104)
+                    local v105 = 0;
+                    while true do
+                        if (v105 == (1)) then
+                            if not v10 then
+                                local v171 = 0;
+                                local v172;
+                                while true do
+                                    if (v171 == (0)) then
+                                        v172 = workspace:FindFirstChild('Players');
+                                        if v172 then
+                                            for v220, v221 in v172:GetDescendants() do
+                                                if v221:IsA('SurfaceGui') then
+                                                    v221:Destroy();
+                                                end
+                                            end
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            break
+                        end
+                        if ((0) == v105) then
+                            v10 = v103;
+                            task.wait(0.1);
+                            v105 = 1;
+                        end
+                    end
+                end
+            });
+            v30:Toggle({
+                text = 'Nametag ESP',
+                callback = function(v106, v107)
+                    local v108 = 0;
+                    while true do
+                        if (v108 == (1)) then
+                            if not v10 then
+                                local v173 = 0;
+                                local v174;
+                                while true do
+                                    if ((0) == v173) then
+                                        v174 = workspace:FindFirstChild('Players');
+                                        if v174 then
+                                            for v222, v223 in v174:GetDescendants() do
+                                                if v223:IsA('BillboardGui') then
+                                                    v223:Destroy();
+                                                end
+                                            end
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            break
+                        end
+                        if (v108 == (0)) then
+                            v13 = v106;
+                            task.wait(0.1);
+                            v108 = 1;
+                        end
+                    end
+                end
+            });
+            break
+        end
+        if (v29 == (0)) then
+            v30 = v17:Tab({
+                name = 'Visuals'
+            });
+            v30:Label({
+                text = 'ESP',
+                TextXAlignment = Enum.TextXAlignment.Center
+            });
+            v29 = 1;
+        end
+    end
+end
+do
+    local v31 = 0;
+    local v32;
+    while true do
+        if (v31 == (0)) then
+            local v66 = 0;
+            while true do
+                if (v66 == 1) then
+                    v31 = 1;
+                    break
+                end
+                if (0 == v66) then
+                    v32 = v17:Tab({
+                        name = 'Misc'
+                    }):Rainbow();
+                    v32:Label({
+                        text = 'MISC OPTIONS',
+                        TextXAlignment = Enum.TextXAlignment.Center
+                    });
+                    v66 = 1;
+                end
+            end
+        end
+        if (v31 == (1)) then
+            v32:Toggle({
+                text = 'Rainbow',
+                callback = function(v109, v110)
+                    v11 = v109;
+                end
+            }):Rainbow();
+            break
+        end
+    end
+end
+wait(0.4);
+v17:Notify({
+    text = "ChknHub Loaded For Phantom Forces\nRight Control To Hide",
+    duration = 3
+});
+_G.color = 0;
+local v19 = workspace.CurrentCamera;
+local v20 = game:GetService('UserInputService');
+local v21;
+local v22 = game:GetService('Players').LocalPlayer;
+function v99(v33, v34)
+    local v35 = 0;
+    local v36;
+    local v37;
+    local v38;
+    local v39;
+    local v40;
+    local v41;
+    local v42;
+    local v43;
+    while true do
+        if (v35 == (3)) then
+            local v67 = 0;
+            while true do
+                if (v67 == (1)) then
+                    v39.Face = 'Back';
+                    v35 = 4;
+                    break
+                end
+                if (v67 == (0)) then
+                    v38.Parent = v33;
+                    v39 = v36:Clone();
+                    v67 = 1;
+                end
+            end
+        end
+        if ((1) == v35) then
+            v37.Size = UDim2.new(1, 0, 1, 0);
+            v37.BorderSizePixel = 0;
+            v37.BackgroundColor3 = v34;
+            v35 = 2;
+        end
+        if ((2) == v35) then
+            v37.BackgroundTransparency = 0.7000000000000455;
+            v38 = v36:Clone();
+            v38.Face = 'Front';
+            v35 = 3;
+        end
+        if (v35 == (8)) then
+            v43.Parent = v33;
+            v36:Destroy();
+            break
+        end
+        if (v35 == (4)) then
+            v39.Parent = v33;
+            v40 = v36:Clone();
+            v40.Face = 'Left';
+            v35 = 5;
+        end
+        if (v35 == (7)) then
+            v42.Parent = v33;
+            v43 = v36:Clone();
+            v43.Face = 'Bottom';
+            v35 = 8;
+        end
+        if ((6) == v35) then
+            v41.Parent = v33;
+            v42 = v36:Clone();
+            v42.Face = 'Top';
+            v35 = 7;
+        end
+        if ((5) == v35) then
+            v40.Parent = v33;
+            v41 = v36:Clone();
+            v41.Face = 'Right';
+            v35 = 6;
+        end
+        if (v35 == (0)) then
+            local v82 = 0;
+            while true do
+                if (v82 == (0)) then
+                    v36 = Instance.new('SurfaceGui');
+                    v36.AlwaysOnTop = true;
+                    v82 = 1;
+                end
+                if (v82 == (1)) then
+                    v37 = Instance.new('Frame', v36);
+                    v35 = 1;
+                    break
+                end
+            end
+        end
+    end
+end
+if _G.c then
+    _G.c:Disconnect();
+end
+if _G.cc then
+    for v57, v58 in pairs(_G.cc) do
+        v58:Remove();
+    end
+end
+function v100()
+    local v44 = workspace:FindFirstChild('Players');
+    if v44 then
+        for v83, v84 in v44:GetChildren() do
+            for v111, v112 in v84:GetDescendants() do
+                if (v112.Name == 'PlayerTag') then
+                    local v138 = game:GetService('Players')[v112.Text];
+                    if v138 then
+                        if (v138.Team ~= v22.Team) then
+                            v21 = v84;
+                            break
+                        end
+                    end
+                end
+            end
+            if v21 then
+                break
+            end
+        end
+    end
+end
+function createPolygon(v45, v46, v47)
+    local v48 = 0;
+    local v49;
+    local v50;
+    while true do
+        if ((0) == v48) then
+            local v85 = 0;
+            local v86;
+            while true do
+                if (v85 == (0)) then
+                    v86 = 0;
+                    while true do
+                        if (v86 == (0)) then
+                            v49 = {};
+                            v50 = ((2) * math.pi) / v47 ;
+                            v86 = 1;
+                        end
+                        if (v86 == (1)) then
+                            v48 = 1;
+                            break
+                        end
+                    end
+                    break
+                end
+            end
+        end
+        if (v48 == (1)) then
+            for v113 = 1, v47 do
+                local v114 = 0;
+                local v115;
+                local v116;
+                local v117;
+                local v118;
+                local v119;
+                local v120;
+                local v121;
+                while true do
+                    if (v114 == 3) then
+                        local v148 = 0;
+                        while true do
+                            if (v148 == (0)) then
+                                v121.Color = Color3.new(1, 1, 1);
+                                v121.From = Vector2.new(v117, v118);
+                                v148 = 1;
+                            end
+                            if (v148 == (1)) then
+                                v121.To = Vector2.new(v119, v120);
+                                v114 = 4;
+                                break
+                            end
+                        end
+                    end
+                    if (v114 == (4)) then
+                        v121.Visible = true;
+                        table.insert(v49, v121);
+                        break
+                    end
+                    if (v114 == 0) then
+                        v115 = v50 * (v113 - (1)) ;
+                        v116 = v50 * v113 ;
+                        v117 = v45.X + (math.cos(v115) * v46) ;
+                        v114 = 1;
+                    end
+                    if (v114 == (2)) then
+                        v121 = Drawing.new('Line');
+                        v121.Transparency = 1;
+                        v121.Thickness = 1;
+                        v114 = 3;
+                    end
+                    if (v114 == (1)) then
+                        v118 = v45.Y + (math.sin(v115) * v46) ;
+                        v119 = v45.X + (math.cos(v116) * v46) ;
+                        v120 = v45.Y + (math.sin(v116) * v46) ;
+                        v114 = 2;
+                    end
+                end
+            end
+            return v49
+        end
+    end
+end
+_G.cc = createPolygon(Vector2.new(v19.ViewportSize.X / (2), v19.ViewportSize.Y / 2), v9, 40);
+local v23 = v9;
+_G.c = game:GetService('RunService').RenderStepped:Connect(function()
+    _G.color = (_G.color + (3E-3)) % (1) ;
+    if (v9 ~= v23) then
+        local v59 = 0;
+        while true do
+            if (v59 == 0) then
+                for v139, v140 in pairs(_G.cc) do
+                    v140:Remove();
+                end
+                _G.cc = createPolygon(Vector2.new(v19.ViewportSize.X / (2), v19.ViewportSize.Y / (2)), v9, 40);
+                break
+            end
+        end
+    end
+    v23 = v9;
+    for v54, v55 in pairs(_G.cc) do
+        v55.Color = Color3.fromHSV(_G.color, 1, 1);
+    end
+    if not v21 then
+        v100();
+    end
+    if v21 then
+        if (# v21:GetChildren() == (0)) then
+            v21 = nil;
+        end
+    end
+    if v21 then
+        local v60 = v19.ViewportSize;
+        local v61;
+        local v62 = math.huge;
+        for v87, v88 in v21:GetChildren() do
+            local v89;
+            local v90;
+            local v91;
+            local v92;
+            for v122, v123 in v88:GetChildren() do
+                if v123:FindFirstChild('NameTagGui') then
+                    v89 = v123;
+                    v91 = v123.NameTagGui.PlayerTag.Text;
+                    v92 = game:GetService('Players'):FindFirstChild(v91);
+                    if v92 then
+                        v90 = v92.UserId;
+                    end
+                    break
+                end
+            end
+            if (v91 and v13) then
+                if not v89:FindFirstChild('BillboardGui') then
+                    local v152 = 0;
+                    local v153;
+                    local v154;
+                    while true do
+                        if (v152 == (2)) then
+                            v154.Parent = v153;
+                            v154.Size = UDim2.new(1, 0, 1, 0);
+                            v154.BackgroundTransparency = 1;
+                            v152 = 3;
+                        end
+                        if ((3) == v152) then
+                            v154.Text = v91;
+                            v154.TextScaled = true;
+                            v154.TextSize = 50;
+                            v152 = 4;
+                        end
+                        if (v152 == 1) then
+                            v153.StudsOffset = Vector3.new(0, 2, 0);
+                            v153.AlwaysOnTop = true;
+                            v154 = Instance.new('TextLabel');
+                            v152 = 2;
+                        end
+                        if (v152 == (0)) then
+                            v153 = Instance.new('BillboardGui', v89);
+                            v153.Size = UDim2.new(10, 0, 2, 0);
+                            v153.Adornee = v89;
+                            v152 = 1;
+                        end
+                        if (v152 == (4)) then
+                            v154.TextColor3 = Color3.new(1, 0, 0);
+                            break
+                        end
+                    end
+                elseif v90 then
+                    if table.find(v15, v90) then
+                        v89:FindFirstChild('BillboardGui').TextLabel.TextColor3 = Color3.fromHSV(_G.color, 1, 1);
+                    end
+                end
+            end
+            if v10 then
+                if v88:FindFirstChildWhichIsA('Folder') then
+                    for v160, v161 in v88:FindFirstChildWhichIsA('Folder'):GetChildren() do
+                        if not v161:FindFirstChildWhichIsA('SurfaceGui') then
+                            if v90 then
+                                if table.find(v15, v90) then
+                                    v99(v161, Color3.fromHSV(_G.color, 1, 1));
+                                else
+                                    v99(v161, Color3.fromRGB(255, 0, 0));
+                                end
+                            end
+                        elseif v90 then
+                            if table.find(v15, v90) then
+                                for v224, v225 in v161:GetChildren() do
+                                    if v225:IsA('SurfaceGui') then
+                                        v225.Frame.BackgroundColor3 = Color3.fromHSV(_G.color, 1, 1);
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            local v93, v94 = v19:WorldToViewportPoint(v89.Position);
+            if v94 then
+                if ((Vector2.new(v93.X, v93.Y) - Vector2.new(v60.X / 2, v60.Y / (2))).Magnitude < v9) then
+                    if ((Vector2.new(v93.X, v93.Y) - Vector2.new(v60.X / (2), v60.Y / (2))).Magnitude < v62) then
+                        local v175 = 0;
+                        while true do
+                            if (v175 == (0)) then
+                                v62 = (Vector2.new(v93.X, v93.Y) - Vector2.new(v60.X / (2), v60.Y / (2))).Magnitude;
+                                v61 = v89;
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+            if v12 then
+                if ((v89.Position - v19.CFrame.Position).Magnitude < (5)) then
+                    local v155 = 0;
+                    local v156;
+                    while true do
+                        if (v155 == (0)) then
+                            v156 = 0;
+                            while true do
+                                if (0 == v156) then
+                                    keypress(70);
+                                    task.wait();
+                                    v156 = 1;
+                                end
+                                if ((1) == v156) then
+                                    keyrelease(70);
+                                    break
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        if (v61 and v8) then
+            local v124 = 0;
+            local v125;
+            local v126;
+            while true do
+                if (v124 == (0)) then
+                    v125, v126 = v19:WorldToViewportPoint(v61.Position);
+                    if (v126 and (v20:IsMouseButtonPressed(Enum.UserInputType.MouseButton2))) then
+                        local v176 = v20:GetMouseLocation();
+                        mousemoverel((v125.x - v176.x) * (2), (v125.y - v176.y) * (2));
+                    end
+                    break
+                end
+            end
+        end
+    end
+    if v11 then
+        local v63 = workspace:FindFirstChild('Players');
+        if v63 then
+            for v131, v132 in v63:GetChildren() do
+                for v142, v143 in v132:GetChildren() do
+                    for v157, v158 in v143:GetChildren() do
+                        if string.find(v158.Name, 'Main') then
+                            for v191, v192 in v158:GetChildren() do
+                                if v192:IsA('BasePart') then
+                                    local v207 = 0;
+                                    while true do
+                                        if (v207 == (0)) then
+                                            v192.Color = Color3.fromHSV(_G.color, 1, 1);
+                                            v192.Material = Enum.Material.ForceField;
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        local v64;
+        for v95, v96 in workspace.CurrentCamera:GetChildren() do
+            for v127, v128 in v96:GetDescendants() do
+                if (v128.ClassName == 'IntValue') then
+                    v64 = v96;
+                    break
+                end
+            end
+            if v64 then
+                for v144, v145 in v64:GetChildren() do
+                    if v145:IsA('BasePart') then
+                        local v162 = 0;
+                        local v163;
+                        while true do
+                            if (v162 == (0)) then
+                                v163 = 0;
+                                while true do
+                                    if (v163 == 0) then
+                                        v145.Color = Color3.fromHSV(_G.color, 1, 1);
+                                        v145.Material = Enum.Material.ForceField;
+                                        break
+                                    end
+                                end
+                                break
+                            end
+                        end
+                    end
+                end
+                break
+            end
+        end
+        if workspace:FindFirstChild('Thanksgiving2024') then
+            local v129 = 0;
+            local v130;
+            while true do
+                if (v129 == (1)) then
+                    for v164, v165 in v130.Detail.GUNS:GetChildren() do
+                        if (v165.Name == 'REX') then
+                            for v195, v196 in v165['MP412 REX']:GetChildren() do
+                                if v196:IsA('BasePart') then
+                                    local v208 = 0;
+                                    while true do
+                                        if (v208 == (0)) then
+                                            v196.Color = Color3.fromHSV(_G.color, 1, 1);
+                                            v196.Material = Enum.Material.ForceField;
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            for v197, v198 in v165['Short Barrel']:GetChildren() do
+                                if v198:IsA('BasePart') then
+                                    v198.Color = Color3.fromHSV(_G.color, 1, 1);
+                                    v198.Material = Enum.Material.ForceField;
+                                end
+                            end
+                        else
+                            for v199, v200 in v165:GetChildren() do
+                                if v200:IsA('BasePart') then
+                                    local v212 = 0;
+                                    while true do
+                                        if (v212 == 0) then
+                                            v200.Color = Color3.fromHSV(_G.color, 1, 1);
+                                            v200.Material = Enum.Material.ForceField;
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    for v166, v167 in v130['Gun Bench']['BOXY BUSTER']:GetChildren() do
+                        if v167:IsA('BasePart') then
+                            local v193 = 0;
+                            while true do
+                                if (v193 == (0)) then
+                                    v167.Color = Color3.fromHSV(_G.color, 1, 1);
+                                    v167.Material = Enum.Material.ForceField;
+                                    break
+                                end
+                            end
+                        end
+                    end
+                    break
+                end
+                if (v129 == (0)) then
+                    v130 = workspace:FindFirstChild('Thanksgiving2024');
+                    for v168, v169 in v130:GetChildren() do
+                        if (string.find(v169.Name, 'Main') and (v169.Name ~= 'CameraMain')) then
+                            for v201, v202 in v169:GetChildren() do
+                                if v202:IsA('BasePart') then
+                                    local v216 = 0;
+                                    while true do
+                                        if (v216 == (0)) then
+                                            v202.Color = Color3.fromHSV(_G.color, 1, 1);
+                                            v202.Material = Enum.Material.ForceField;
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            break
+                        end
+                    end
+                    v129 = 1;
+                end
+            end
+        end
+        local v65 = workspace:FindFirstChild('Ignore');
+        if v65 then
+            for v133, v134 in v65.GunDrop:GetChildren() do
+                for v146, v147 in v134:GetChildren() do
+                    if v147:IsA('BasePart') then
+                        local v170 = 0;
+                        while true do
+                            if (v170 == (0)) then
+                                v147.Color = Color3.fromHSV(_G.color, 1, 1);
+                                v147.Material = Enum.Material.ForceField;
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end);

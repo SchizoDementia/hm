@@ -1,0 +1,158 @@
+--[[ https://scriptblox.com/u/ce_poulet --]]
+local event = game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("RemoteEvent")
+
+local localPlayer = game:GetService("Players").LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+
+local bubble = false
+local coins = false
+local editGravity = false
+local gravity = 95
+
+function hatchEgg(egg)
+    event:FireServer("HatchEgg",egg,1)
+end
+
+
+local chknUi = loadstring(game:HttpGet("https://rbxscripts.pythonanywhere.com/chknui"))()
+local Base = chknUi.init()
+
+local basicTab = Base:Tab({name="Basic"})
+basicTab:Toggle({
+    text="Bubble",
+    callback=function(state)
+        bubble=state
+    end,
+})
+basicTab:Splitter()
+basicTab:Button({
+    text="Sell",
+    callback=function()
+        event:FireServer("Teleport","Workspace.Worlds.The Overworld.Islands.Twilight.Island.Sell.Root")
+    end,
+})
+basicTab:Toggle({
+    text="Coin Collection Aura",
+    callback=function(state)
+        coins = state
+    end,
+})
+basicTab:Splitter()
+basicTab:Toggle({
+    text="Edit Gravity",
+    callback = function(state)
+        editGravity = state
+    end,
+})
+basicTab:Slider({
+    text="Gravity",
+    min = 0,
+    max = 190,
+    callback=function(state)
+        gravity = state
+    end,
+})
+
+
+local gumHolder = localPlayer.PlayerGui.ScreenGui.GumShop.Frame.Items.Inner.List
+local tabHolder = localPlayer.PlayerGui.ScreenGui.GumShop.Frame.Tray
+function buyBest(tab)
+    local button = tabHolder[tab].Button
+
+    task.spawn(function()
+        for _, conn in ipairs(getconnections(button.Activated)) do
+            conn:Fire()
+        end
+    end)
+    task.wait(.1)
+    print("-----------------")
+    local children = gumHolder:GetChildren()
+    for _,item in children do
+        if item:IsA("Frame") then
+            if item.Button.Cost.Label.TextColor3 == Color3.fromRGB(255,215,15) and item.Button.Cost.Visible == true then
+                print(item.Name)
+                local args = {
+                    [1] = "GumShopPurchase",
+                    [2] = item.Name
+                }
+                event:FireServer(unpack(args))
+            end
+        end
+    end
+end
+local shopTab = Base:Tab({name="Shop"})
+shopTab:Button({
+    text="Buy Best",
+    callback=function()
+        buyBest("Gum")
+        buyBest("Flavors")
+    end,
+})
+
+local teleportTab = Base:Tab({name="Teleports"})
+teleportTab:Button({
+    text="Spawn",
+    callback=function()
+        event:FireServer("Teleport", "Workspace.Worlds.The Overworld.PortalSpawn")
+    end,
+})
+teleportTab:Button({
+    text="Floating Island",
+    callback=function()
+        event:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Floating Island.Island.Portal.Spawn")
+    end,
+})
+teleportTab:Button({
+    text="Outer Space",
+    callback=function()
+        event:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Outer Space.Island.Portal.Spawn")
+    end,
+})
+teleportTab:Button({
+    text="Twilight",
+    callback=function()
+        event:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Twilight.Island.Portal.Spawn")
+    end,
+})
+teleportTab:Button({
+    text="The Void",
+    callback=function()
+        event:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.The Void.Island.Portal.Spawn")
+    end,
+})
+teleportTab:Button({
+    text="Zen",
+    callback=function()
+        event:FireServer("Teleport", "Workspace.Worlds.The Overworld.Islands.Zen.Island.Portal.Spawn")
+    end,
+})
+
+local Chunker
+for _,chunker in workspace.Rendered:GetChildren() do
+    if chunker.Name == "Chunker" and #chunker:GetChildren() > 0 and not chunker:FindFirstChild("Coming Soon") then
+        Chunker = chunker
+    end
+end
+
+
+
+
+local hash = 0
+if _G.c then _G.c:Disconnect() end
+_G.c = game:GetService("RunService").RenderStepped:Connect(function()
+    if bubble then
+        event:FireServer("BlowBubble")
+    end
+    hash = (hash+1)%30
+    if hash ~= 0 then return end
+
+    if coins then
+        for _,coin in Chunker:GetChildren() do
+            game:GetService("ReplicatedStorage").Remotes.Pickups.CollectPickup:FireServer(coin.Name)
+        end
+    end
+
+    if editGravity then
+        workspace.Gravity = gravity
+    end
+end)

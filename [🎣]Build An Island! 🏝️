@@ -1,0 +1,150 @@
+--[[ https://scriptblox.com/u/ce_poulet --]]
+local farm = false
+local hay = false
+local com = game:GetService("ReplicatedStorage"):WaitForChild("Communication")
+
+local localPlayer = game:GetService("Players").LocalPlayer
+
+local plot = workspace.Plots:FindFirstChild(localPlayer.Name)
+local resources = plot.Resources
+
+function hasPlot(name)
+    local plot = plot.Land:FindFirstChild(name)
+    if plot then
+        return plot
+    else
+        return false
+    end
+end
+function getCrafter(name)
+    local plot = hasPlot(name)
+    if plot then
+        if plot:FindFirstChild("Crafter") then
+            return plot.Crafter.Attachment
+        else
+            return false
+        end
+    else
+        return false
+    end
+end
+
+local chknUi = loadstring(game:HttpGet("https://rbxscripts.pythonanywhere.com/chknui"))()
+local Base = chknUi.init()
+
+local farmTab = Base:Tab({name="Farm"})
+farmTab:Toggle({
+    text="Auto Harvest",
+    callback=function(state)
+        farm=state
+    end,
+})
+farmTab:Button({
+    text="Break World Tree Event",
+    callback=function(state)
+        if workspace:WaitForChild("GlobalResources"):FindFirstChild("World Tree") then
+            for i=0,1500 do
+                com:WaitForChild("HitResource"):FireServer(workspace:WaitForChild("GlobalResources"):WaitForChild("World Tree"))
+            end
+        end
+    end,
+})
+
+local craftTab = Base:Tab({name="Craft"})
+craftTab:Toggle({
+    text="Hay",
+    callback=function(state)
+        hay=state
+    end,
+})
+craftTab:Button({
+    text="Planks",
+    callback=function()
+        local crafter = getCrafter("S13")
+        if crafter then
+            com:WaitForChild("Craft"):FireServer(crafter)
+        end
+    end,
+})
+craftTab:Button({
+    text="Bricks",
+    callback=function()
+        local crafter = getCrafter("S24")
+        if crafter then
+            com:WaitForChild("Craft"):FireServer(crafter)
+        end
+    end,
+})
+craftTab:Button({
+    text="Bamboo Planks",
+    callback=function()
+        local crafter = getCrafter("S72")
+        if crafter then
+            com:WaitForChild("Craft"):FireServer(crafter)
+        end
+    end,
+})
+craftTab:Button({
+    text="Iron",
+    callback=function()
+        local crafter = getCrafter("S23")
+        if crafter then
+            com:WaitForChild("DoubleCraft"):FireServer(crafter)
+        end
+    end,
+})
+craftTab:Button({
+    text="Magma Furnace",
+    callback=function()
+        local crafter = getCrafter("S106")
+        if crafter then
+            com:WaitForChild("DoubleCraft"):FireServer(crafter)
+        end
+    end,
+})
+
+
+
+
+if _G.c then _G.c:Disconnect() end
+local cache = {}
+_G.hash = 0
+_G.c = game:GetService("RunService").RenderStepped:Connect(function()
+    _G.hash = (_G.hash + 1)%30
+    if _G.hash ~= 0 then 
+        return
+    end
+
+    if farm then
+        for _,resource in resources:GetChildren() do
+            if not cache[resource] then
+                for i=1,5 do
+                    if not resource:FindFirstChild(tostring(i+1)) then
+                        cache[resource] = {}
+                        cache[resource].maxPart = resource[tostring(i)]:GetChildren()[1]
+                        break
+                    end
+                end
+            end
+            if cache[resource] then
+                local maxPart = cache[resource].maxPart
+                if maxPart then
+                    if maxPart.Transparency == 0 then
+                        for i=0,tonumber(maxPart.Parent.Name)+1 do
+                            com.HitResource:FireServer(resource)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if hay then
+        if hasPlot("S203") then
+            if hasPlot("S203").AnimalPen.Holder.Main.Attachment.BillboardGui.MainCount.Text == "0/300" then
+                com.Craft:FireServer(getCrafter("S203"))
+            elseif hasPlot("S203").AnimalPen.Holder.Main.Attachment.BillboardGui.MainCount.Text ~= "300/300" then
+                com.Animals.AddHay:FireServer("S203")
+            end
+        end
+    end
+end)

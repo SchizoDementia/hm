@@ -1,0 +1,26 @@
+--[[ https://scriptblox.com/u/ce_poulet --]]
+local us = game:GetService("ReplicatedStorage"):WaitForChild("Functions"):WaitForChild("UpdateStat")
+us:InvokeServer("money", 100000000000000)
+
+for i=0,10 do
+    us:InvokeServer("breakslevel", 100)
+    us:InvokeServer("sprainslevel", 100)
+    us:InvokeServer("dislocationslevel", 100)
+    us:InvokeServer("flightlevel", 10)
+    us:InvokeServer("speedlevel", 10)
+    us:InvokeServer("jumplevel", 10)
+    us:InvokeServer("cooldownlevel", 100)
+    us:InvokeServer("fuellevel", 100)
+end
+
+for map = 1,3 do
+    for stage = 1,10 do
+        us:InvokeServer(
+            "map"..tostring(map).."stage"..tostring(stage),
+            true,
+            true
+        )
+    end
+end
+
+game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId)
