@@ -1,0 +1,508 @@
+--[[
+discord.gg/25ms
+
+
+[ / ] Bypasses Virtualized Authorization Service Loader (VASL),
+allowing you to execute VASL-protected Roblox scripts without a valid key or HWID verification.
+
+[ + ] Unlocks premium features in VASL-protected scripts for free,
+while bypassing advanced anti-tamper, metatable checks, and integrity validation systems used to prevent leaks.
+
+
+
+--]]
+local OldRF, OldLF = readfile, loadfile;
+
+local ReadFile = function(path)
+    if path == "VASL-Version.lua" or path == "VASL.lua" then
+        return error()
+    else
+        return OldRF(path)
+    end;
+end;
+
+local LoadFile = function(path)
+    if path == "VASL-Version.lua" or path == "VASL.lua" then
+        return error()
+    else
+        return OldLF(path)
+    end;
+end;
+
+getgenv().readfile = ReadFile;
+getgenv().loadfile = LoadFile;
+
+local VASLTable = {};
+
+local DeadFunction = function() end;
+local eqc, lenindex, statobjindex = 0, 0, 0;
+
+local StatObj = {}
+local ValidateIndex, statobhc = 0, 0;
+local LAL = setmetatable({}, {
+    __index = function(Self, Index)
+        if Index == "Validate" then
+            ValidateIndex = ValidateIndex + 1
+            print("Indexed Validate")
+            if ValidateIndex == 1 then
+                return ValKey;
+            else
+                return DeadFunction
+            end;
+        elseif Index == "StatusObject" then
+            statobhc = statobhc + 1;
+            if statobhc == 3 then
+                return StatObj;
+            end
+        end
+    end;
+    __newindex = function(self, key, value)
+        VASLTable[key] = value;
+        -- rawset(self, key, value);
+    end;
+})
+
+local asdasdsadasd = 0;
+ValKey = function()
+    setmetatable(StatObj, {
+        __index = function(Self, Index)
+            if Index == "getmtcheck" then
+                return true;
+            elseif Index == "Premium" then
+                return true;
+            else
+                statobjindex = statobjindex + 1
+            end;
+            print("Indexed StatObj " .. statobjindex)
+            if statobjindex == 2 then
+                return getmetatable(StatObj)
+            elseif statobjindex == 3 then
+                return StatObj
+            elseif statobjindex == 9 then
+                return LAL
+            elseif statobjindex == 11 then
+                return setmetatable({}, {
+                    __call = function()
+                        return StatObj;
+                    end;
+                })
+            elseif statobjindex == 12 then
+                return 47
+            elseif statobjindex == 13 or statobjindex == 27 then
+                return 1;
+            elseif statobjindex == 15 then
+                return DeadFunction
+            elseif statobjindex == 21 then
+                return setmetatable({}, {
+                    __call = function()
+                        return StatObj;
+                    end;
+                })
+            elseif statobjindex == 23 or statobjindex == 41 or statobjindex == 48 or statobjindex == 57 then
+                return DeadFunction
+            elseif statobjindex == 24 or statobjindex == 25 or statobjindex == 33 or statobjindex == 54 or statobjindex == 59 or statobjindex == 61 or statobjindex == 62 or statobjindex == 64 or statobjindex == 65 or statobjindex == 66 or statobjindex == 70 or statobjindex == 74 then
+                return 1;
+            elseif statobjindex == 26 or statobjindex == 32 then
+                return 33;
+            elseif statobjindex == 35 or statobjindex == 55 or statobjindex == 56 or statobjindex == 58 then
+                return 'bobobobo'
+            elseif statobjindex == 43 then
+                return 'yah sigma'
+            elseif statobjindex == 51 then
+                return function()
+                    return 1;
+                end;
+            elseif statobjindex == 52 then
+                return 1;
+            elseif statobjindex == 53 or statobjindex == 69 then
+                return 4;
+            elseif statobjindex == 60 then
+                return 0.0625;
+            elseif statobjindex == 68 then
+                return os.clock() - 0.5;
+            elseif statobjindex == 1 then
+                return StatObj
+            elseif statobjindex == 73 then
+                return 12;
+            elseif Index == "UserId" then
+                return 1;
+            end
+        end,
+        __len = function(Self)
+            lenindex = lenindex + 1;
+            print("len called " .. lenindex);
+            if lenindex == 1 then
+                return 1;
+            else
+                return 2;
+            end;
+        end;
+        __eq = function(a, b)
+            eqc = eqc + 1
+            print("eqc " .. eqc);
+            if eqc == 1 then
+                return true;
+            elseif eqc == 2 then
+                return true;
+            elseif eqc == 3 then
+                return true;
+            elseif eqc == 4 then
+                return false;
+            elseif eqc == 5 then
+                return false;
+            elseif eqc == 9 then
+                return false;
+            elseif eqc == 11 then
+                return false;
+            elseif eqc == 22 then
+                return false;
+            else
+                return true;
+            end
+        end;
+        __call = function()
+            return StatObj
+        end;
+        __metatable = false;
+        __mul = function(a,b)
+            return a;
+        end;
+    })
+    return StatObj, StatObj, DeadFunction, "abc"
+end;
+
+local oldgetmt, getmtc = getmetatable, 0
+getgenv().getmetatable = function(Argument)
+    if Argument.getmtcheck then
+        getmtc = getmtc + 1;
+        warn("called " .. getmtc);
+        if getmtc == 6 or getmtc == 10 or getmtc == 11 or getmtc == 12 then
+            return "lel";
+        end;
+        if getmtc > 100 then
+            wait(0.4);
+        end;
+    end;
+    return oldgetmt(Argument);
+end;
+local oldrq = rawequal
+local fse = true  -- Flag to track the first else occurrence
+
+getgenv().rawequal = function(a, b)
+    local s, e = pcall(function() return a.getmtcheck end)
+    if not s then
+        return oldrq(a, b)
+    else
+        if fse then
+            fse = false
+            return true
+        else
+            return false
+        end
+    end
+end
+
+
+AUTHKEY = AUTHKEY or false and "Infinix_6892c082e64ef755b5255d7c5afc126eb35474167b317f2d2fdd49b86f068a1d" or "Infinix_53d7bf7dab7643fddbd63cbffd028452078f5a1a762eec8bac2c0f3d0a1fde3c";
+
+LAL.Service = "infinix"; -- YOUR SERVICE IDENTIFIER
+LAL.HWID = nil; -- CHANGE IF YOU WANT TO USE A DIFFERENT HWID
+LAL.Status = {} -- CONSTANT DO NOT CHANGE
+LAL.StatusObject = {} -- CONSTANT DO NOT CHANGE
+
+-- setclipboard( LAL:GetKey() ) -- GET KEY URL
+
+local Status, StatusObject, Validate, Message = LAL:Validate(AUTHKEY)
+
+local Metatable = getmetatable(StatusObject) -- REQUIRED FOR THE IF STATEMENT
+local tpc = 0
+local function CustomPrint(arg)
+    tpc = tpc + 1
+    print("[DEBUG] Statement " .. tpc .. ": " .. tostring(arg))
+end
+
+-- count 1:
+CustomPrint(Status and StatusObject);
+
+-- count 2:
+CustomPrint(Validate == LAL.Validate);
+
+-- count 3:
+CustomPrint(Metatable == getmetatable(StatusObject));
+
+-- count 4:
+CustomPrint(Status);
+
+-- count 5:
+CustomPrint(StatusObject);
+
+-- count 6:
+CustomPrint(not (StatusObject[-1] == Metatable));
+
+-- count 7:
+CustomPrint(not (LAL.Status == Status));
+
+-- count 8:
+CustomPrint(StatusObject[-1] == Metatable);
+
+-- count 9:
+CustomPrint(not (LAL.StatusObject == StatusObject));
+
+-- count 10:
+CustomPrint(StatusObject[-1] == StatusObject);
+
+-- count 11:
+CustomPrint(StatusObject[-1] == nil);
+
+-- count 12:
+CustomPrint(StatusObject == StatusObject);
+
+-- count 13:
+CustomPrint(Status == StatusObject);
+
+-- count 14:
+CustomPrint(not (StatusObject == StatusObject));
+
+-- count 15:
+CustomPrint(StatusObject[-1] == Status.Key);
+
+-- count 16:
+CustomPrint(not (#StatusObject == #StatusObject));
+
+-- count 17:
+CustomPrint(not (StatusObject[-1] == LAL));
+
+-- count 18:
+CustomPrint(not (Status == StatusObject));
+
+-- count 19:
+CustomPrint(not (StatusObject[-1] == LAL));
+
+-- count 20:
+CustomPrint(rawequal(StatusObject[-1], LAL));
+
+-- count 21:
+CustomPrint(not (StatusObject[-1] == LAL));
+
+-- count 22:
+CustomPrint(StatusObject(Status));
+
+-- count 23:
+CustomPrint(not (getmetatable(Status)));
+
+-- count 24:
+CustomPrint(StatusObject[-1](Status));
+
+-- count 25:
+CustomPrint(StatusObject == Status);
+
+-- count 26:
+CustomPrint(StatusObject[-1] == Status.UserId * 47);
+
+-- count 27:
+CustomPrint(Status(Status));
+
+-- count 28:
+CustomPrint(not StatusObject[-0]);
+
+-- count 29:
+CustomPrint(StatusObject == Status);
+
+-- count 30:
+CustomPrint(StatusObject[-0] == LAL.Validate);
+
+-- count 31:
+CustomPrint(not (Metatable == StatusObject[-1]));
+
+-- count 32:
+CustomPrint(StatusObject == Status);
+
+-- count 33:
+CustomPrint(not StatusObject[-0]);
+
+-- count 34:
+CustomPrint(Status(Status));
+
+-- count 35:
+CustomPrint(not (Metatable == StatusObject[-1]));
+
+-- count 36:
+CustomPrint(not (StatusObject == Status));
+
+-- count 37:
+CustomPrint(StatusObject(Status));
+
+-- count 38:
+CustomPrint(StatusObject[-1] ~= Status.UserId * 24);
+
+-- count 39:
+CustomPrint(Status == StatusObject);
+
+-- count 40:
+CustomPrint(StatusObject(Status));
+
+-- count 41:
+CustomPrint(not (getmetatable(Status)));
+
+-- count 42:
+CustomPrint(StatusObject[-1](Status));
+
+-- count 43:
+CustomPrint(Status(Status));
+
+-- count 44:
+CustomPrint(StatusObject[-1] == LAL.Service);
+
+-- count 45:
+CustomPrint(not (StatusObject == StatusObject));
+
+-- count 46:
+CustomPrint(not (StatusObject[-1] == nil));
+	
+-- count 47:
+CustomPrint(Metatable ~= getmetatable(StatusObject));
+
+-- count 48:
+CustomPrint(StatusObject == Status);
+
+-- count 49:
+CustomPrint(StatusObject[-0] == StatusObject.UserId);
+
+-- count 50:
+CustomPrint(StatusObject[-1] == StatusObject.UserId * 33);
+
+-- count 51:
+CustomPrint(not (Status == StatusObject and StatusObject[-1] == StatusObject.UserId));
+
+-- count 52:
+CustomPrint(not (StatusObject.Key == StatusObject.UserId * 22));
+
+-- count 53:
+CustomPrint(not rawequal(StatusObject, Status));
+
+-- count 54:
+CustomPrint(not (getmetatable(LAL) == Status or StatusObject == nil));
+
+-- count 55:
+CustomPrint(StatusObject[-1] == Status.UserId * 33);
+
+-- count 56:
+CustomPrint(not (StatusObject == Status.UserId * 50));
+
+-- count 57:
+CustomPrint(not rawequal(StatusObject[-1], StatusObject.Key));
+
+-- count 58:
+CustomPrint(StatusObject == Status);
+
+-- count 59:
+CustomPrint(not (StatusObject.Key == Status.UserId));
+
+-- count 60:
+CustomPrint(not (rawequal(getmetatable(StatusObject), Metatable) and StatusObject[-1] ~= nil));
+
+-- count 61:
+CustomPrint(StatusObject == Status);
+
+-- count 62:
+CustomPrint(not (StatusObject[-1] == getmetatable(LAL)));
+
+-- count 63:
+CustomPrint(StatusObject[-0] == LAL.Validate);
+
+-- count 64:
+CustomPrint(StatusObject[-1] == LAL.Service);
+
+-- count 65:
+CustomPrint(not (StatusObject == LAL.StatusObject and not (Status == LAL.Status)));
+
+-- count 66:
+CustomPrint(StatusObject[-3]);
+
+-- count 67:
+CustomPrint(not (StatusObject[-3] == Metatable or StatusObject == nil));
+
+-- count 68:
+CustomPrint(not (rawequal(StatusObject, Status) and (getmetatable(Status) == LAL or Metatable == nil)));
+
+-- count 69:
+CustomPrint(StatusObject[-2] == StatusObject.Key);
+
+-- count 70:
+CustomPrint(StatusObject == Status * (StatusObject[-1] or 1));
+
+-- count 71:
+CustomPrint(StatusObject[-0] == LAL.Validate);
+
+-- count 72:
+CustomPrint(getmetatable(StatusObject) == getmetatable(Status));
+
+-- count 73:
+CustomPrint(StatusObject == Status);
+
+-- count 74:
+CustomPrint(not (StatusObject.Key == LAL.Key and Status.UserId == LAL.UserId));
+
+-- count 75:
+CustomPrint(StatusObject[-1]() == Status.UserId);
+
+-- count 76:
+CustomPrint(StatusObject == LAL.StatusObject or Status == LAL.Status or Metatable == getmetatable(LAL));
+
+-- count 77:
+CustomPrint(StatusObject[-1] ^ 2 == Status.UserId * 16);
+
+-- count 78:
+CustomPrint(StatusObject[-0]);
+
+-- count 79:
+CustomPrint(StatusObject[-1]);
+
+-- count 80:
+CustomPrint(StatusObject[-2] == LAL.Validate);
+
+-- count 81:
+CustomPrint(not (rawequal(StatusObject[-1], LAL) or getmetatable(Status) == Metatable));
+
+-- count 82:
+CustomPrint(StatusObject[-1] == (Status.UserId * 16) ^ 0.5);
+
+-- count 83:
+CustomPrint(not (StatusObject[-3] == nil or StatusObject[-1] == nil));
+
+-- count 84:
+CustomPrint(not (StatusObject == Status and StatusObject[-1] == Status.UserId - 1));
+
+-- count 85:
+CustomPrint(StatusObject[-1] == StatusObject[-2] * StatusObject.UserId);
+
+-- count 86:
+CustomPrint(not (os.clock() - StatusObject[-3] >= 1));
+
+-- count 87:
+CustomPrint(StatusObject == StatusObject and not (StatusObject ~= StatusObject));
+
+-- count 88:
+CustomPrint(StatusObject[-1] % 2 == 0);
+
+-- count 89:
+CustomPrint(StatusObject[-2] % 2 == 1);
+
+-- count 90:
+CustomPrint(not (StatusObject == Status));
+
+warn("[ZONE]");
+-- count 91:
+CustomPrint(not (getmetatable(StatusObject) == Metatable and getmetatable(Status) == Metatable));
+warn("[ZONE]");
+
+-- count 92:
+CustomPrint(StatusObject[-0] == LAL.Validate or StatusObject[-0] == LAL.Service);
+
+-- count 93:
+CustomPrint(StatusObject[-1] == (Status.UserId * 144) ^ 0.5);
+
+-- count 94:
+CustomPrint(not (StatusObject == nil or Status == nil or LAL == nil));
+
+CustomPrint(Status["Premium"])

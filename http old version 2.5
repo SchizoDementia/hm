@@ -1,0 +1,43 @@
+--[[
+discord.gg/25ms
+
+
+[ / ] Bypasses legacy v2.5 loaders,
+allowing you to execute Roblox scripts requiring clipboard-based manual keys without entering or owning a valid key.
+
+[ + ] Unlocks premium functions in v2.5-protected scripts for free,
+letting you access premium-only features in scripts using the old v2.5 system without paying.
+
+
+
+--]]
+-- ONLY TURN ONE OF THOSE TO `true` IF YOU TURN MORE THAN 2 ON IT WILL NOT WORK!
+-- This will only work with the V2.5 and not a newer version.
+getgenv().normalkey = true -- If you're executing a script which is for the free version, but you still need to obtain a key.
+getgenv().premiumkey = false -- If you're executing a premium script, so it will check if your key is premium.
+getgenv().keylessscript = false -- If you're executing a keyless version, idk why I even put this here but yeah...
+
+hookfunction(error, newcclosure(function()
+    return nil;
+end))
+
+local OldLoadstring = nil
+OldLoadstring = hookfunction(loadstring, newcclosure(function(str)
+    if str:find("getgenv().setclipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)") then
+        if getgenv().normalkey then
+            return OldLoadstring([[return{ValidateKey=function()return true end,GetKey=function()return"Crack made by wporc, join discord.gg"end}]])
+        elseif getgenv().premiumkey then
+                return OldLoadstring([[return{ValidatePremiumKey=function()return true end,GetKey=function()return"Crack made by wporc, join discord.gg"end}]])
+        elseif getgenv().keylessscript then
+                return OldLoadstring([[return{Authenticate_Keyless=function()return true end,GetKey=function()return"Crack made by wporc, join discord.gg"end}]])
+        else
+                return OldNameCall(self,...)
+            end
+        end
+    return OldLoadstring(str)
+end))
+
+print("Crack executed")
+hookfunction(request, function()
+    return nil;
+end)

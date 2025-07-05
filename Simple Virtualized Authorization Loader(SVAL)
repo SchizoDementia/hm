@@ -1,0 +1,70 @@
+--[[
+discord.gg/25ms
+
+
+[ / ] Bypasses Simple Virtualized Authorization Loader (SVAL),
+allowing you to run SVAL-protected Roblox scripts without providing a valid key.
+
+[ + ] Lets you execute SVAL-protected scripts for free,
+bypassing the loader’s key checks so you can test or analyze scripts without paying.
+
+
+
+--]]
+local loadstr = loadstring;
+local panda = game:HttpGet("https://raw.githubusercontent.com/Panda-Repositories/PandaKS_Libraries/refs/heads/main/library/LuaLib/ROBLOX/PandaSVALLib.lua")
+getgenv().loadstring = function(chunk)
+    if chunk == panda then
+        return function()
+            local PandaAuth = {};
+            PandaAuth.Initialize = function()
+            end;
+            PandaAuth.GetKey = function()
+                return "key is bob"
+            end;
+            PandaAuth.ValidateKey = function(one, two)
+                return one == "bob" or two == "bob"
+            end;
+            return PandaAuth;
+        end;
+    end;
+    return loadstr(chunk)
+end;
+
+
+-- local _game = game;
+-- getgenv().PandaAuth = {};
+-- PandaAuth.Initialize = function()
+-- end;
+-- PandaAuth.GetKey = function()
+--     return "hellooo"
+-- end;
+
+-- PandaAuth.ValidateKey = function(one, two)
+--     return one == "bob" or two == "bob"
+-- end;
+
+-- getgenv().game = setmetatable({}, {
+--     __index = function(_, key)
+--         if string.sub(key, 1, 8) == "HttpGet" then
+--             return function(_, Url)
+--                 if Url == "https://raw.githubusercontent.com/Panda-Repositories/PandaKS_Libraries/refs/heads/main/library/LuaLib/ROBLOX/PandaSVALLib.lua" then
+--                     return "return PandaAuth";
+--                 end;
+--                 return _game:HttpGet(Url);
+--             end;
+--         end;
+--         local index = _game[key];
+--         if typeof(index) == "function" then
+--             return function(_, ...)
+--                 return index(_game, ...);
+--             end;
+--         else
+--             return index;
+--         end;
+--     end,
+--     __newindex = function(_, k, v)
+--         error();
+--     end,
+--     __metatable = "The metatable is protected"
+-- });

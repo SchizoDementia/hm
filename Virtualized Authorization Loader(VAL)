@@ -1,0 +1,186 @@
+--[[
+discord.gg/25ms
+
+
+[ / ] Bypasses Virtualized Authorization Loader (VAL),
+allowing you to execute VAL-protected Roblox scripts without providing a valid key.
+
+[ + ] Grants premium features in VAL-protected scripts for free,
+letting you use premium-only functions without paying.
+
+
+
+--]]
+local Debugging = true;
+
+if isfile("VALCache/VAL") then
+    delfile("VALCache/VAL");
+end;
+local Pelinda = game:HttpGet("https://raw.githubusercontent.com/Panda-Repositories/PandaKS_Libraries/main/library/LuaLib/ROBLOX/VAL")
+local DeadFunction = function() end
+local PelindaTable, ValidateKeyTable, ExistingPandaFunctions = {}, {}, {};
+local OldLoadstring = loadstring;
+
+
+setfenv(DeadFunction, {
+    ["getrenv\0"] = setmetatable({
+        [1] = ValidateKeyTable;
+        [2] = function() return ValidateKeyTable end;
+        [3] = setmetatable({}, {
+            __index = function()
+                return ValidateKeyTable;
+            end;
+            __call = function()
+                return ValidateKeyTable;
+            end;
+        });
+        [4] = ValidateKeyTable;
+        [5] = ValidateKeyTable;
+    }, {
+        __newindex = function()
+            return DeadFunction;
+        end;
+    });
+});
+
+setfenv(getfenv(DeadFunction)["getrenv\0"][2], {
+    ["getrenv\0"] = getmetatable(getfenv(DeadFunction)["getrenv\0"][3])
+})
+
+local PremiumCount, PremiumCount2 = 0, 0;
+local loadstrc = 0;
+getgenv().loadstring = function(Argument)
+    loadstrc = loadstrc + 1;
+    if Argument == Pelinda then
+        if Debugging then
+            warn("[Crack] Detected pelinda")
+        end
+        return function()
+            local SetInternalCount, ValidateKeyCount = 0, 0;
+            local PandaAuth = setmetatable(ExistingPandaFunctions, {
+                __index = function(Self, Index)
+                    if Index == "SetInternal" then
+                        SetInternalCount = SetInternalCount + 1;
+                        if Debugging then
+                            print("SetInternalCount: " .. tostring(SetInternalCount) .. " line:" .. tostring(debug.traceback()));
+                        end
+                        if SetInternalCount == 1 then
+                            return DeadFunction
+                        elseif SetInternalCount == 2 then
+                            return function(self, InternalTable)
+                                PelindaTable.Service = InternalTable.Service;
+                                PelindaTable.APIToken = InternalTable.APIToken;
+                                PelindaTable.VigenereKey = InternalTable.VigenereKey;
+                                PelindaTable.TrueEndpoint = InternalTable.TrueEndpoint;
+                                PelindaTable.FalseEndpoint = InternalTable.FalseEndpoint;
+                                PelindaTable.KickWebhook = InternalTable.KickWebhook and InternalTable.KickWebhook or nil;
+                                PelindaTable.ValidWebhook = InternalTable.ValidWebhook and InternalTable.ValidWebhook or nil;
+                                PelindaTable.InvalidWebhook = InternalTable.InvalidWebhook and InternalTable.InvalidWebhook or nil;
+                                if Debugging then
+                                    table.foreach(PelindaTable, print)
+                                end;
+                            end;
+                        elseif SetInternalCount == 3 then
+                            return DeadFunction
+                        elseif SetInternalCount == 4 then
+                            return function() end;
+                        elseif SetInternalCount == 5 then
+                            return function()
+                                return "bob", Self.SetInternal;
+                            end;
+                        elseif SetInternalCount == 6 then
+                            return DeadFunction
+                        elseif SetInternalCount == 7 then
+                            return function()
+                                return DeadFunction;
+                            end;
+                        end
+                    elseif Index == "Enum" then
+                        return {
+                            PreWhitelist = {
+                                HWID = "HWID";
+                                UserId = "UserId";
+                                Key = "Key";
+                            }
+                        }
+                    elseif Index == "SetPreWhitelist" then
+                        return DeadFunction
+                    elseif Index == "GetInternal" then
+                        return function()
+                            return setmetatable({
+                                Crypt = {
+                                    SHA256 = function(Self, Endpoint, VignereKey, nothing, nothing2)
+                                    end;
+                                    EncryptC = function(Self, ShaString, VignereKey, nothing) -- defining args js for fun :)
+                                        return "wporc is sigma"
+                                    end;
+                                }
+                            }, {
+                                __tostring = function()
+                                    while true do return end do return end;
+                                end;
+                                __newindex = function()
+                                    error("no new indexes");
+                                end;
+                            })
+                        end;
+                    elseif Index == "Validated" then
+                        return {
+                            [1] = PelindaTable.TrueEndpoint;
+                            [2] = true;
+                        }
+                    elseif Index == "ValidateKey" then
+                        ValidateKeyCount = ValidateKeyCount + 1;
+                        if Debugging then
+                            print("ValidateKeyCount: " .. tostring(ValidateKeyCount));
+                        end;
+                        if ValidateKeyCount == 1 then
+                            return function()
+                                local ResultTable = {
+                                    ENV = getfenv(1);
+                                    Raw = PelindaTable.TrueEndpoint;
+                                }
+                                setmetatable(ResultTable, {
+                                    __index = function(selfy, indexy)
+                                        if indexy == "KEY" then
+                                            return "Cracked";
+                                        elseif indexy == "Encrypted" then
+                                            return "wporc is sigma";
+                                        elseif indexy == "Pre" then
+                                            PremiumCount = PremiumCount + 1;
+                                            if PremiumCount == 1 then
+                                                return false
+                                            else
+                                                return true
+                                            end
+                                        elseif indexy == "Premium" then
+                                            PremiumCount2 = PremiumCount2 + 1;
+                                            if PremiumCount2 == 1 then
+                                                return false
+                                            else
+                                                return true
+                                            end
+                                        end
+                                    end 
+                                })
+                                return ResultTable
+                            end;
+                        else
+                            return DeadFunction
+                        end
+                    end;
+                end;
+            })
+            return PandaAuth;
+        end;
+    end
+    return OldLoadstring(Argument);
+end;
+
+if Debugging then
+    warn("[Crack Loaded]")
+end;
+
+setclipboard("a");
+getgenv()._Key = "YOURKEYHERE"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Xenijo/Sleepy/main/Main/Premium"))()

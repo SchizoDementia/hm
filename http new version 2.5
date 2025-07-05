@@ -1,0 +1,43 @@
+--[[
+discord.gg/25ms
+
+
+[ / ] Bypasses HTTP v2.5 loader systems,
+allowing you to trick remote key servers into accepting any key as valid automatically.
+
+[ + ] Grants premium status in HTTP v2.5-protected scripts for free,
+bypassing online checks so you can use premium scripts without purchasing a key.
+
+
+
+--]]
+local hwid = gethwid() or game:GetService("RbxAnalyticsService"):GetClientId();
+local DataFetch = {
+    Success = true,
+    StatusCode = 200,
+    Headers = {},
+    Body = string.format("{\"V2_Authentication\":\"success\",\"Key_Information\":{\"Premium_Mode\":true,\"expiresAt\":\"Fri Nov 01 2080 19:00:00 GMT-05\",\"Hardware_ID\":\"%s\",\"NoKey_Requirement\":false}}", hwid)
+};
+
+local req = request;
+local reqy = newcclosure(function(Data)
+    local oo
+    local s,e = pcall(function() oo = Data.Url end)
+    if s then
+        if Data.Url:find("v2_validation") then
+            return DataFetch;
+        end
+    end;
+    return req(Data);
+end);
+
+getgenv().request = reqy;
+getgenv().http.request = reqy;
+getgenv().http_request = reqy;
+
+if syn then
+    local syny = table.clone(syn);
+    syny.request = reqy;
+
+    getgenv().syn = syny;
+end;
